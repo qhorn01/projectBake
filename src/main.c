@@ -1,5 +1,7 @@
 #include "raylib.h"
 #include "raymath.h"
+#include "gameStates.h"
+#include "types.h"
 
 #define MAX(a, b) ((a)>(b)? (a) : (b)) // taken from letterbox Raylib example
 #define MIN(a, b) ((a)<(b)? (a) : (b))
@@ -18,20 +20,23 @@
 int main()
 {
     // Initialization
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = 1920;
+    const int screenHeight = 1080;
 
     // Enable config flags for resizable window and vertical synchro
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "raylib");
-    SetWindowMinSize(320, 240);
+    SetWindowMinSize(384, 216);
 
-    int gameScreenWidth = 640;
-    int gameScreenHeight = 480;
+    int gameScreenWidth = 1920;
+    int gameScreenHeight = 1080;
 
     // Render texture initialization, used to hold the rendering result so we can easily resize it
     RenderTexture2D target = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);  // Texture scale filter to use
+
+    // instantiations for data types ex. enums and structs
+    GameState currentState = TEST_CENTER; // state control for the game
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -51,11 +56,33 @@ int main()
         virtualMouse.x = (mouse.x - (GetScreenWidth() - (gameScreenWidth*scale))*0.5f)/scale;
         virtualMouse.y = (mouse.y - (GetScreenHeight() - (gameScreenHeight*scale))*0.5f)/scale;
         virtualMouse = Vector2Clamp(virtualMouse, (Vector2){ 0, 0 }, (Vector2){ (float)gameScreenWidth, (float)gameScreenHeight });
-
+        // switches through gamestate logic
+        switch(currentState){
+            case MENU:
+                break;
+            case KITCHEN:
+                break;
+            case TEST_CENTER:
+                testCenterLogic(&currentState);
+                break;
+            default:
+                break;
+        }
         // Draw everything in the render texture, note this will not be rendered on screen, yet
         BeginTextureMode(target);
-            ClearBackground(RAYWHITE);
-            
+        // switches through gamestate rendering
+        switch(currentState){
+            case MENU:
+                break;
+            case KITCHEN:
+                break;
+            case TEST_CENTER:
+                testCenterRender(&currentState);
+                break;
+            default:
+                break;
+        }
+
         EndTextureMode();
 
         // Draw
