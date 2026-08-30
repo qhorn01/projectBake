@@ -4,11 +4,16 @@
 
 #include "raylib.h"
 #include "globalFunctions.h"
+#include "types.h"
 #include "gameStates.h"
 
-void testCenterLogic(GameState *currentState){
-    
+void testCenterLogic(GameState *currentState, Item *testItem, Vector2 mouse){
+    dragItem(testItem, mouse);
 }
-void testCenterRender(){
-    
+void testCenterRender(Item *testItem){
+    ClearBackground(GetColor(0xAAAAAA));
+
+    DrawRectangle(testItem->position.x, testItem->position.y, 
+        testItem->dimensions.x, testItem->dimensions.y, BLACK);
+
 }

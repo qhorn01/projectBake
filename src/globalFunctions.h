@@ -6,8 +6,9 @@
 #include <stdlib.h>
 
 #include "raylib.h"
+#include "types.h"
 #include "globalFunctions.h"
 
-
+void dragItem(Item *item, Vector2 mouse);
 
 #endif

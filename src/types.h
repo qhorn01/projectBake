@@ -11,6 +11,7 @@ typedef struct {
     Vector2 spriteIndex; // x, y index on sprite sheet
     float frame; // counts the number of frames counted
     float frameReset; // determines how many frames have to pass before it resets
-} item; // item that can be dragged across the screen with the mouse and dropped at a specific location on the screen
+    bool isPressed;
+} Item; // item that can be dragged across the screen with the mouse and dropped at a specific location on the screen
 
 #endif

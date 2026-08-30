@@ -15,7 +15,7 @@
 // Module Functions Declaration
 
 //----------------------------------------------------------------------------------
-// Program main entry point
+// Program main entry pointglobalFunctions.c
 //----------------------------------------------------------------------------------
 int main()
 {
@@ -36,7 +36,9 @@ int main()
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);  // Texture scale filter to use
 
     // instantiations for data types ex. enums and structs
-    GameState currentState = TEST_CENTER; // state control for the game
+    GameState currentState = TEST_CENTER;
+                     // pos, defPos, w&h, spriteIndex, frame, frameReset
+    Item testItem = { { 0, 0 }, { 0, 0 }, { 100, 100 }, { 0, 0 }, 0, 30, false };
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -63,7 +65,7 @@ int main()
             case KITCHEN:
                 break;
             case TEST_CENTER:
-                testCenterLogic(&currentState);
+                testCenterLogic(&currentState, &testItem, virtualMouse);
                 break;
             default:
                 break;
@@ -77,7 +79,7 @@ int main()
             case KITCHEN:
                 break;
             case TEST_CENTER:
-                testCenterRender(&currentState);
+                testCenterRender(&testItem);
                 break;
             default:
                 break;
