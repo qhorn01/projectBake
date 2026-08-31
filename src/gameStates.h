@@ -14,7 +14,7 @@ typedef enum { // defined in main.c
     TEST_CENTER // for debugging and testing only
 } GameState; // changes different gamestates ex. main menu, rooms, levels, minigames, etc.
 
-void testCenterLogic(GameState *currentState, Item *testItem, Vector2 mouse);
-void testCenterRender(Item *testItem);
+void testCenterLogic(GameState *currentState, Vector2 mouse);
+void testCenterRender();
 
 #endif

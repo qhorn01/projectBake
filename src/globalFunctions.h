@@ -10,5 +10,6 @@
 #include "globalFunctions.h"
 
 void dragItem(Item *item, Vector2 mouse);
+void snapItem(Item *item, Vector2 mouse, Rectangle rectangle);
 
 #endif

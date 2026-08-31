@@ -20,8 +20,8 @@
 int main()
 {
     // Initialization
-    const int screenWidth = 1920;
-    const int screenHeight = 1080;
+    const int screenWidth = 50;
+    const int screenHeight = 50;
 
     // Enable config flags for resizable window and vertical synchro
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
@@ -37,8 +37,7 @@ int main()
 
     // instantiations for data types ex. enums and structs
     GameState currentState = TEST_CENTER;
-                     // pos, defPos, w&h, spriteIndex, frame, frameReset
-    Item testItem = { { 0, 0 }, { 0, 0 }, { 100, 100 }, { 0, 0 }, 0, 30, false };
+
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -65,7 +64,7 @@ int main()
             case KITCHEN:
                 break;
             case TEST_CENTER:
-                testCenterLogic(&currentState, &testItem, virtualMouse);
+                testCenterLogic(&currentState, virtualMouse);
                 break;
             default:
                 break;
@@ -79,7 +78,7 @@ int main()
             case KITCHEN:
                 break;
             case TEST_CENTER:
-                testCenterRender(&testItem);
+                testCenterRender();
                 break;
             default:
                 break;
