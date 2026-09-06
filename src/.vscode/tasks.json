@@ -11,24 +11,24 @@
                 "PLATFORM=PLATFORM_DESKTOP",
                 "BUILD_MODE=DEBUG",
                 "PROJECT_NAME=${fileBasenameNoExtension}",
-                "OBJS=${fileBasenameNoExtension}.c gameStates.c globalFunctions.c"
+                "OBJS=${fileBasenameNoExtension}.c globalFunctions.c gameStates/testCenter.c gameStates/kitchen.c"
             ],
             "windows": {
                 "command": "mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileBasenameNoExtension}.c gameStates.c globalFunctions.c",
+                    "OBJS=${fileBasenameNoExtension}.c globalFunctions.c gameStates/testCenter.c gameStates/kitchen.c",
                     "BUILD_MODE=DEBUG"
-                ],
+                ]
             },
             "osx": {
                 "args": [
                     "RAYLIB_PATH=<path_to_raylib>/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileBasenameNoExtension}.c gameStates.c globalFunctions.c",
+                    "OBJS=${fileBasenameNoExtension}.c globalFunctions.c gameStates/testCenter.c gameStates/kitchen.c",
                     "BUILD_MODE=DEBUG"
-                ],
+                ]
             },
             "group": {
                 "kind": "build",
@@ -45,22 +45,22 @@
             "args": [
                 "PLATFORM=PLATFORM_DESKTOP",
                 "PROJECT_NAME=${fileBasenameNoExtension}",
-                "OBJS=${fileBasenameNoExtension}.c gameStates.c globalFunctions.c"
+                "OBJS=${fileBasenameNoExtension}.c globalFunctions.c gameStates/testCenter.c gameStates/kitchen.c"
             ],
             "windows": {
                 "command": "mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileBasenameNoExtension}.c gameStates.c globalFunctions.c" 
-                ],
+                    "OBJS=${fileBasenameNoExtension}.c globalFunctions.c gameStates/testCenter.c gameStates/kitchen.c"
+                ]
             },
             "osx": {
                 "args": [
                     "RAYLIB_PATH=<path_to_raylib>/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileBasenameNoExtension}.c gameStates.c globalFunctions.c"
-                ],
+                    "OBJS=${fileBasenameNoExtension}.c globalFunctions.c gameStates/testCenter.c gameStates/kitchen.c"
+                ]
             },
             "group": "build",
             "problemMatcher": [

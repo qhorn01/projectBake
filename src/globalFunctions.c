@@ -4,7 +4,6 @@
 
 #include "raylib.h"
 #include "globalFunctions.h"
-#include "types.h"
 /*
 This .c file contains functions that correspond with specific structs
 Everytime you see something like "Item struct:" that indicates that all
@@ -29,7 +28,24 @@ void dragItem(Item *item, Vector2 mouse){ // allows played to drag item accross 
     }
 }
 
-void snapItem(Item *item, Vector2 mouse, Rectangle rectangle){ // allows players to place item in a specific place
+void dragItemOffset(Item *item, float offsetX, float offsetY, float hitboxX, float hitboxY, float hitboxW, float hitboxH, Vector2 mouse){ // same as dragItem but allows for offset and hitbox values to be specified
+    if(CheckCollisionPointRec(mouse, (Rectangle){ (item->position.x + hitboxX), (item->position.y + hitboxY), 
+        hitboxW, hitboxH }) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            item->isPressed = true;
+    }
+    if(item->isPressed == true){
+        
+        item->position.x = mouse.x - (offsetX);
+        item->position.y = mouse.y - (offsetY);
+        
+        if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+            item->position = item->defaultPosition;
+            item->isPressed = false;
+        }
+    }
+}
+
+void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle){ // allows players to place item in a specific place
     if(CheckCollisionPointRec(mouse, rectangle) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
             item->defaultPosition.x = rectangle.x;
             item->defaultPosition.y = rectangle.y;

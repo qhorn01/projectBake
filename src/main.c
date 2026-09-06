@@ -1,7 +1,8 @@
 #include "raylib.h"
 #include "raymath.h"
-#include "gameStates.h"
-#include "types.h"
+#include "gameStates/testCenter.h"
+#include "gameStates/kitchen.h"
+#include "globalFunctions.h"
 
 #define MAX(a, b) ((a)>(b)? (a) : (b)) // taken from letterbox Raylib example
 #define MIN(a, b) ((a)<(b)? (a) : (b))
@@ -20,24 +21,25 @@
 int main()
 {
     // Initialization
-    const int screenWidth = 50;
-    const int screenHeight = 50;
+    const int screenWidth = 150;
+    const int screenHeight = 150;
 
     // Enable config flags for resizable window and vertical synchro
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "raylib");
     SetWindowMinSize(384, 216);
 
-    int gameScreenWidth = 1920;
-    int gameScreenHeight = 1080;
+    int gameScreenWidth = 2560;
+    int gameScreenHeight = 1440;
 
     // Render texture initialization, used to hold the rendering result so we can easily resize it
     RenderTexture2D target = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);  // Texture scale filter to use
 
     // instantiations for data types ex. enums and structs
-    GameState currentState = TEST_CENTER;
+    GameState currentState = KITCHEN;
 
+    int previousState = -1; // used to check if the gamestate has changed, if it has then it will unload the previous gamestate's textures and load the new one
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -57,11 +59,40 @@ int main()
         virtualMouse.x = (mouse.x - (GetScreenWidth() - (gameScreenWidth*scale))*0.5f)/scale;
         virtualMouse.y = (mouse.y - (GetScreenHeight() - (gameScreenHeight*scale))*0.5f)/scale;
         virtualMouse = Vector2Clamp(virtualMouse, (Vector2){ 0, 0 }, (Vector2){ (float)gameScreenWidth, (float)gameScreenHeight });
+        
+        // switches through gamestate textures
+        if (currentState != previousState){
+            switch(previousState){
+                case MENU:
+                    break;
+                case KITCHEN:
+                    unloadKitchen();
+                    break;
+                case TEST_CENTER:
+                    break;
+                default:
+                    break;
+            }
+            switch(currentState){
+                case MENU:
+                    break;
+                case KITCHEN:
+                    initKitchen();
+                    break;
+                case TEST_CENTER:
+                    break;
+                default:
+                    break;
+            }
+            previousState = currentState;
+        }
+        
         // switches through gamestate logic
         switch(currentState){
             case MENU:
                 break;
             case KITCHEN:
+                kitchenLogic(&currentState, virtualMouse);
                 break;
             case TEST_CENTER:
                 testCenterLogic(&currentState, virtualMouse);
@@ -76,6 +107,7 @@ int main()
             case MENU:
                 break;
             case KITCHEN:
+                kitchenRender();
                 break;
             case TEST_CENTER:
                 testCenterRender();
@@ -88,7 +120,7 @@ int main()
 
         // Draw
         BeginDrawing();
-            ClearBackground(BLACK);     // Clear screen background
+            ClearBackground(BLACK); // Clear screen background
 
             DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
                 (Rectangle){ (GetScreenWidth() - ((float)gameScreenWidth*scale))*0.5f, (GetScreenHeight() - ((float)gameScreenHeight*scale))*0.5f,
