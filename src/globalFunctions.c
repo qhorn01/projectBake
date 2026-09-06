@@ -21,10 +21,6 @@ void dragItem(Item *item, Vector2 mouse){ // allows played to drag item accross 
         item->position.x = mouse.x - (item->dimensions.x / 2);
         item->position.y = mouse.y - (item->dimensions.y / 2);
         
-        if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-            item->position = item->defaultPosition;
-            item->isPressed = false;
-        }
     }
 }
 
@@ -38,10 +34,14 @@ void dragItemOffset(Item *item, float offsetX, float offsetY, float hitboxX, flo
         item->position.x = mouse.x - (offsetX);
         item->position.y = mouse.y - (offsetY);
         
-        if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-            item->position = item->defaultPosition;
-            item->isPressed = false;
-        }
+
+    }
+}
+
+void dropItemReturn(Item *item, Vector2 mouse){ // returns item to default position when left mouse button is released
+    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+        item->position = item->defaultPosition;
+        item->isPressed = false;
     }
 }
 
@@ -49,5 +49,6 @@ void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle){ // allows pla
     if(CheckCollisionPointRec(mouse, rectangle) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
             item->defaultPosition.x = rectangle.x;
             item->defaultPosition.y = rectangle.y;
+            item->isPressed = false;
     }
 }

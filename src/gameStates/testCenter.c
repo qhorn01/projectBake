@@ -19,6 +19,7 @@ void testCenterLogic(GameState *currentState, Vector2 mouse){
     dropItemSnap(&testItem, mouse, trDrop);
     dropItemSnap(&testItem, mouse, blDrop);
     dropItemSnap(&testItem, mouse, brDrop);
+    dropItemReturn(&testItem, mouse);
     // Item *item, Vector2 mouse
     dragItem(&testItem, mouse);
 

@@ -29,6 +29,8 @@ typedef struct {
 void dragItem(Item *item, Vector2 mouse);
 // same as dragItem but allows for offset and hitbox values to be specified
 void dragItemOffset(Item *item, float offsetX, float offsetY, float hitboxX, float hitboxY, float hitboxW, float hitboxH, Vector2 mouse);
+// returns item to default position when left mouse button is released
+void dropItemReturn(Item *item, Vector2 mouse);
 // allows players to place item in a specific place
 void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle);
 

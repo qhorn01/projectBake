@@ -11,14 +11,16 @@ static Texture2D signs;
 static Texture2D ovenOff;
 static Texture2D ovenOn;
 // struct textures for items in kitchen
-static Texture2D batter;
+static Texture2D batterSheet;
 static Texture2D circlePanSheet;
 
 // structs
-                        // pos,            defPos,      w&h,  spriteIndex, frame, frameReset, isPressed
-Item batterVanillaItem = { { 528, 590 }, { 528, 590 }, { 135, 103 }, { 0, 0 }, 0, 0, false };
-Item batterChocolateItem = { { 621, 590 }, { 621, 590 }, { 135, 103 }, { 0, 103 }, 0, 0, false };
-Item batterStrawberryItem = { { 720, 590 }, { 720, 590 }, { 135, 103 }, { 0, 206 }, 0, 0, false };
+        // pos,       defPos,      w&h,  spriteIndex, frame, frameReset, isPressed
+Item batter[3] = {
+    { { 528, 590 }, { 528, 590 }, { 135, 103 }, { 0, 0 }, 0, 0, false }, // vanilla
+    { { 621, 590 }, { 621, 590 }, { 135, 103 }, { 0, 1 }, 0, 0, false }, // chocolate
+    { { 720, 590 }, { 720, 590 }, { 135, 103 }, { 0, 2 }, 0, 0, false } // strawberry
+}; 
                     // pos,        defPos,      w&h,   spriteIndex, frame, frameReset, isPressed
 Item circlePan = { { 600, 870 }, { 600, 870 }, { 233, 122 }, { 0, 0 }, 0, 0, false };
 
@@ -33,7 +35,7 @@ void initKitchen(void){
     ovenOn = LoadTexture("assets/kitchen/ovenOn.png");
 
     // struct textures for items in kitchen
-    batter = LoadTexture("assets/kitchen/items/batter.png");
+    batterSheet = LoadTexture("assets/kitchen/items/batter.png");
 
     circlePanSheet = LoadTexture("assets/kitchen/items/circlePans.png");
 }
@@ -48,13 +50,13 @@ void unloadKitchen(void){
     UnloadTexture(ovenOff);
     UnloadTexture(ovenOn);
     // struct textures for items in kitchen
-    UnloadTexture(batter);
+    UnloadTexture(batterSheet);
 
     UnloadTexture(circlePanSheet);
 }
 
 void renderBatter(Item *item){
-    DrawTextureRec(batter, 
+    DrawTextureRec(batterSheet, 
                     (Rectangle){ 
                         item->spriteIndex.x, 
                         item->spriteIndex.y * item->dimensions.y,
@@ -67,11 +69,30 @@ void renderBatter(Item *item){
 void kitchenLogic(GameState *currentState, Vector2 mouse){
     // cake batter items
     // Item *item, float offsetX, float offsetY, float hitboxX, float hitboxY, float hitboxW, float hitboxH, Vector2 mouse
-    dragItemOffset(&batterVanillaItem, 93, (batterVanillaItem.dimensions.y / 2), 45, 0, 86, 103, mouse);
-    dragItemOffset(&batterChocolateItem, 93, (batterChocolateItem.dimensions.y / 2), 45, 0, 86, 103, mouse);
-    dragItemOffset(&batterStrawberryItem, 93, (batterStrawberryItem.dimensions.y / 2), 45, 0, 86, 103, mouse);
+    dragItemOffset(&batter[0], 93, (batter[0].dimensions.y / 2), 45, 0, 86, 103, mouse);
+    dragItemOffset(&batter[1], 93, (batter[1].dimensions.y / 2), 45, 0, 86, 103, mouse);
+    dragItemOffset(&batter[2], 93, (batter[2].dimensions.y / 2), 45, 0, 86, 103, mouse);
     // pan items
     dragItem(&circlePan, mouse);
+    dropItemReturn(&circlePan, mouse);
+    // cake making steps
+    for (int i = 0; i < 3; i++){
+        if(CheckCollisionPointRec(mouse, 
+                                (Rectangle)
+                                {circlePan.position.x, 
+                                circlePan.position.y, 
+                                circlePan.dimensions.x, 
+                                circlePan.dimensions.y}) 
+                                && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)
+                                && batter[i].isPressed == true){
+            circlePan.spriteIndex.y = batter[i].spriteIndex.y + 1;
+            batter[i].position = batter[i].defaultPosition;
+            batter[i].isPressed = false;
+        } else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+            batter[i].position = batter[i].defaultPosition;
+            batter[i].isPressed = false;
+        }
+    }
 }
 
 void kitchenRender(void){
@@ -86,9 +107,9 @@ void kitchenRender(void){
 
     // struct textures for items in kitchen bottom layer
 
-    if (batterStrawberryItem.isPressed == false){ renderBatter(&batterStrawberryItem); }
-    if (batterChocolateItem.isPressed == false){ renderBatter(&batterChocolateItem); }
-    if (batterVanillaItem.isPressed == false){ renderBatter(&batterVanillaItem); }
+    if (batter[2].isPressed == false){ renderBatter(&batter[2]); }
+    if (batter[1].isPressed == false){ renderBatter(&batter[1]); }
+    if (batter[0].isPressed == false){ renderBatter(&batter[0]); }
 
     // background elements top layer
     DrawTexture(containersTopLayer, 570, 600, WHITE);
@@ -104,8 +125,8 @@ void kitchenRender(void){
                         (Vector2){ circlePan.position.x, circlePan.position.y }, WHITE);
 
     
-    if (batterStrawberryItem.isPressed == true){ renderBatter(&batterStrawberryItem); }
-    if (batterChocolateItem.isPressed == true){ renderBatter(&batterChocolateItem); }
-    if (batterVanillaItem.isPressed == true){ renderBatter(&batterVanillaItem); }
+    if (batter[2].isPressed == true){ renderBatter(&batter[2]); }
+    if (batter[1].isPressed == true){ renderBatter(&batter[1]); }
+    if (batter[0].isPressed == true){ renderBatter(&batter[0]); }
     
 }
