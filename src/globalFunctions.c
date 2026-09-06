@@ -52,3 +52,14 @@ void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle){ // allows pla
             item->isPressed = false;
     }
 }
+
+void renderItem(Item *item, Texture2D spriteSheet){ // renders item to screen
+    DrawTextureRec(spriteSheet, 
+                    (Rectangle){ 
+                        item->spriteIndex.x, 
+                        item->spriteIndex.y * item->dimensions.y,
+                        item->dimensions.x, 
+                        item->dimensions.y },
+                        (Vector2){ item->position.x, item->position.y }, 
+                        WHITE);
+}

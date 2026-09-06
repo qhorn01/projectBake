@@ -13,6 +13,8 @@ static Texture2D ovenOn;
 // struct textures for items in kitchen
 static Texture2D batterSheet;
 static Texture2D circlePanSheet;
+static Texture2D squarePanSheet;
+static Texture2D trianglePanSheet;
 
 // structs
         // pos,       defPos,      w&h,  spriteIndex, frame, frameReset, isPressed
@@ -21,8 +23,12 @@ Item batter[3] = {
     { { 621, 590 }, { 621, 590 }, { 135, 103 }, { 0, 1 }, 0, 0, false }, // chocolate
     { { 720, 590 }, { 720, 590 }, { 135, 103 }, { 0, 2 }, 0, 0, false } // strawberry
 }; 
-                    // pos,        defPos,      w&h,   spriteIndex, frame, frameReset, isPressed
-Item circlePan = { { 600, 870 }, { 600, 870 }, { 233, 122 }, { 0, 0 }, 0, 0, false };
+        // pos,        defPos,       w&h,    spriteIndex, frame, frameReset, isPressed
+Item pan[3] = {
+    { { 600, 870 }, { 600, 870 }, { 233, 122 }, { 0, 0 }, 0, 0, false },  // circle
+    { { 925, 880 }, { 925, 880 }, { 250, 105 }, { 0, 0 }, 0, 0, false },  // square
+    { { 1250, 890 }, { 1250, 890 }, { 182, 109 }, { 0, 0 }, 0, 0, false } // triangle
+};
 
 void initKitchen(void){
     background = LoadTexture("assets/kitchen/kitchenBg.png");
@@ -37,7 +43,9 @@ void initKitchen(void){
     // struct textures for items in kitchen
     batterSheet = LoadTexture("assets/kitchen/items/batter.png");
 
-    circlePanSheet = LoadTexture("assets/kitchen/items/circlePans.png");
+    circlePanSheet = LoadTexture("assets/kitchen/items/circlePanSheet.png");
+    squarePanSheet = LoadTexture("assets/kitchen/items/squarePanSheet.png");
+    trianglePanSheet = LoadTexture("assets/kitchen/items/trianglePanSheet.png");
 }
 
 void unloadKitchen(void){
@@ -51,49 +59,42 @@ void unloadKitchen(void){
     UnloadTexture(ovenOn);
     // struct textures for items in kitchen
     UnloadTexture(batterSheet);
-
     UnloadTexture(circlePanSheet);
-}
-
-void renderBatter(Item *item){
-    DrawTextureRec(batterSheet, 
-                    (Rectangle){ 
-                        item->spriteIndex.x, 
-                        item->spriteIndex.y * item->dimensions.y,
-                        item->dimensions.x, 
-                        item->dimensions.y },
-                        (Vector2){ item->position.x, item->position.y }, 
-                        WHITE);
+    UnloadTexture(squarePanSheet);
+    UnloadTexture(trianglePanSheet);
 }
 
 void kitchenLogic(GameState *currentState, Vector2 mouse){
     // cake batter items
     // Item *item, float offsetX, float offsetY, float hitboxX, float hitboxY, float hitboxW, float hitboxH, Vector2 mouse
-    dragItemOffset(&batter[0], 93, (batter[0].dimensions.y / 2), 45, 0, 86, 103, mouse);
-    dragItemOffset(&batter[1], 93, (batter[1].dimensions.y / 2), 45, 0, 86, 103, mouse);
-    dragItemOffset(&batter[2], 93, (batter[2].dimensions.y / 2), 45, 0, 86, 103, mouse);
+    
+    // drop item logic located under cake making steps
+    for (int i = 0; i < 3; i++){ dragItemOffset(&batter[i], 93, (batter[i].dimensions.y / 2), 45, 0, 86, 103, mouse); }
     // pan items
-    dragItem(&circlePan, mouse);
-    dropItemReturn(&circlePan, mouse);
+    for (int i = 0; i < 3; i++){ dragItem(&pan[i], mouse); dropItemReturn(&pan[i], mouse); }
+
     // cake making steps
     for (int i = 0; i < 3; i++){
-        if(CheckCollisionPointRec(mouse, 
-                                (Rectangle)
-                                {circlePan.position.x, 
-                                circlePan.position.y, 
-                                circlePan.dimensions.x, 
-                                circlePan.dimensions.y}) 
-                                && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)
-                                && batter[i].isPressed == true){
-            circlePan.spriteIndex.y = batter[i].spriteIndex.y + 1;
-            batter[i].position = batter[i].defaultPosition;
-            batter[i].isPressed = false;
-        } else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-            batter[i].position = batter[i].defaultPosition;
-            batter[i].isPressed = false;
+        for (int j = 0; j < 3; j++){
+           if(CheckCollisionPointRec(mouse, 
+                                    (Rectangle)
+                                    {pan[i].position.x, 
+                                    pan[i].position.y, 
+                                    pan[i].dimensions.x, 
+                                    pan[i].dimensions.y}) 
+                                    && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)
+                                    && batter[j].isPressed == true){
+
+                pan[i].spriteIndex.y = batter[j].spriteIndex.y + 1;
+                if (i == 0){ pan[1].spriteIndex.y = 0; pan[2].spriteIndex.y = 0; }
+                if (i == 1){ pan[0].spriteIndex.y = 0; pan[2].spriteIndex.y = 0; }
+                if (i == 2){ pan[0].spriteIndex.y = 0; pan[1].spriteIndex.y = 0; }
+            }
         }
     }
-}
+    for (int i = 0; i < 3; i++){ dropItemReturn(&batter[i], mouse); }
+
+} // end kitchenLogic
 
 void kitchenRender(void){
     ClearBackground(PINK);
@@ -107,26 +108,23 @@ void kitchenRender(void){
 
     // struct textures for items in kitchen bottom layer
 
-    if (batter[2].isPressed == false){ renderBatter(&batter[2]); }
-    if (batter[1].isPressed == false){ renderBatter(&batter[1]); }
-    if (batter[0].isPressed == false){ renderBatter(&batter[0]); }
+    if (batter[2].isPressed == false){ renderItem(&batter[2], batterSheet); }
+    if (batter[1].isPressed == false){ renderItem(&batter[1], batterSheet); }
+    if (batter[0].isPressed == false){ renderItem(&batter[0], batterSheet); }
+
+    if (pan[2].isPressed == false){ renderItem(&pan[2], trianglePanSheet); }
+    if (pan[1].isPressed == false){ renderItem(&pan[1], squarePanSheet); }
+    if (pan[0].isPressed == false){ renderItem(&pan[0], circlePanSheet); }
 
     // background elements top layer
     DrawTexture(containersTopLayer, 570, 600, WHITE);
 
     // struct textures for items in kitchen top layer
+    if (batter[2].isPressed == true){ renderItem(&batter[2], batterSheet); }
+    if (batter[1].isPressed == true){ renderItem(&batter[1], batterSheet); }
+    if (batter[0].isPressed == true){ renderItem(&batter[0], batterSheet); }
 
-    DrawTextureRec(circlePanSheet,
-                    (Rectangle){ 
-                        circlePan.spriteIndex.x, 
-                        circlePan.spriteIndex.y * circlePan.dimensions.y,
-                        circlePan.dimensions.x, 
-                        circlePan.dimensions.y },
-                        (Vector2){ circlePan.position.x, circlePan.position.y }, WHITE);
-
-    
-    if (batter[2].isPressed == true){ renderBatter(&batter[2]); }
-    if (batter[1].isPressed == true){ renderBatter(&batter[1]); }
-    if (batter[0].isPressed == true){ renderBatter(&batter[0]); }
-    
-}
+    if (pan[2].isPressed == true){ renderItem(&pan[2], trianglePanSheet); }
+    if (pan[1].isPressed == true){ renderItem(&pan[1], squarePanSheet); }
+    if (pan[0].isPressed == true){ renderItem(&pan[0], circlePanSheet); }
+} // end kitchenRender
