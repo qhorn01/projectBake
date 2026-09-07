@@ -45,14 +45,6 @@ void dropItemReturn(Item *item, Vector2 mouse){ // returns item to default posit
     }
 }
 
-void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle){ // allows players to place item in a specific place
-    if(CheckCollisionPointRec(mouse, rectangle) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-            item->defaultPosition.x = rectangle.x;
-            item->defaultPosition.y = rectangle.y;
-            item->isPressed = false;
-    }
-}
-
 void dropItemReturnBool(Item *item, Vector2 mouse, Rectangle rectangle, bool *boolVar, bool trueOrFalse){ // changes a bool value when an item is dropped in a specific place
     if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && item->isPressed == true){
         if(CheckCollisionPointRec(mouse, rectangle)){
@@ -65,10 +57,18 @@ void dropItemReturnBool(Item *item, Vector2 mouse, Rectangle rectangle, bool *bo
     }
 }
 
+void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle){ // allows players to place item in a specific place
+    if(CheckCollisionPointRec(mouse, rectangle) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+            item->defaultPosition.x = rectangle.x;
+            item->defaultPosition.y = rectangle.y;
+            item->isPressed = false;
+    }
+}
+
 void renderItem(Item *item, Texture2D spriteSheet){ // renders item to screen
     DrawTextureRec(spriteSheet, 
                     (Rectangle){ 
-                        item->spriteIndex.x, 
+                        item->spriteIndex.x * item->dimensions.x, 
                         item->spriteIndex.y * item->dimensions.y,
                         item->dimensions.x, 
                         item->dimensions.y },

@@ -31,10 +31,10 @@ void dragItem(Item *item, Vector2 mouse);
 void dragItemOffset(Item *item, float offsetX, float offsetY, float hitboxX, float hitboxY, float hitboxW, float hitboxH, Vector2 mouse);
 // returns item to default position when left mouse button is released
 void dropItemReturn(Item *item, Vector2 mouse);
-// allows players to place item in a specific place
-void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle);
 // changes a bool value when an item is dropped in a specific place
 void dropItemReturnBool(Item *item, Vector2 mouse, Rectangle rectangle, bool *boolVar, bool trueOrFalse);
+// allows players to place item in a specific place
+void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle);
 // renders item to screen
 void renderItem(Item *item, Texture2D spriteSheet);
 
