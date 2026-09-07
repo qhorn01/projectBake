@@ -53,6 +53,18 @@ void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle){ // allows pla
     }
 }
 
+void dropItemReturnBool(Item *item, Vector2 mouse, Rectangle rectangle, bool *boolVar, bool trueOrFalse){ // changes a bool value when an item is dropped in a specific place
+    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && item->isPressed == true){
+        if(CheckCollisionPointRec(mouse, rectangle)){
+            *boolVar = trueOrFalse;
+        } else {
+            *boolVar = !trueOrFalse;
+        }
+        item->position = item->defaultPosition;
+        item->isPressed = false;
+    }
+}
+
 void renderItem(Item *item, Texture2D spriteSheet){ // renders item to screen
     DrawTextureRec(spriteSheet, 
                     (Rectangle){ 

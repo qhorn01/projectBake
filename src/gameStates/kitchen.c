@@ -16,6 +16,13 @@ static Texture2D circlePanSheet;
 static Texture2D squarePanSheet;
 static Texture2D trianglePanSheet;
 
+static Texture2D circleCakeSheet;
+static Texture2D squareCakeSheet;
+static Texture2D triangleCakeSheet;
+
+// variables
+bool ovenIsOn = false; // oven is off by default
+
 // structs
         // pos,       defPos,      w&h,  spriteIndex, frame, frameReset, isPressed
 Item batter[3] = {
@@ -29,6 +36,8 @@ Item pan[3] = {
     { { 925, 880 }, { 925, 880 }, { 250, 105 }, { 0, 0 }, 0, 0, false },  // square
     { { 1250, 890 }, { 1250, 890 }, { 182, 109 }, { 0, 0 }, 0, 0, false } // triangle
 };
+
+Rectangle ovenHitbox = { 1650, 920, 345, 200 }; // hitbox for oven
 
 void initKitchen(void){
     background = LoadTexture("assets/kitchen/kitchenBg.png");
@@ -46,6 +55,10 @@ void initKitchen(void){
     circlePanSheet = LoadTexture("assets/kitchen/items/circlePanSheet.png");
     squarePanSheet = LoadTexture("assets/kitchen/items/squarePanSheet.png");
     trianglePanSheet = LoadTexture("assets/kitchen/items/trianglePanSheet.png");
+    
+    circleCakeSheet = LoadTexture("assets/kitchen/items/circleCakeSheet.png");
+    squareCakeSheet = LoadTexture("assets/kitchen/items/squareCakeSheet.png");
+    triangleCakeSheet = LoadTexture("assets/kitchen/items/triangleCakeSheet.png");
 }
 
 void unloadKitchen(void){
@@ -62,6 +75,10 @@ void unloadKitchen(void){
     UnloadTexture(circlePanSheet);
     UnloadTexture(squarePanSheet);
     UnloadTexture(trianglePanSheet);
+    
+    UnloadTexture(circleCakeSheet);
+    UnloadTexture(squareCakeSheet);
+    UnloadTexture(triangleCakeSheet);
 }
 
 void kitchenLogic(GameState *currentState, Vector2 mouse){
@@ -71,7 +88,14 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
     // drop item logic located under cake making steps
     for (int i = 0; i < 3; i++){ dragItemOffset(&batter[i], 93, (batter[i].dimensions.y / 2), 45, 0, 86, 103, mouse); }
     // pan items
-    for (int i = 0; i < 3; i++){ dragItem(&pan[i], mouse); dropItemReturn(&pan[i], mouse); }
+    for (int i = 0; i < 3; i++){ 
+        dragItem(&pan[i], mouse); 
+        if (pan[i].spriteIndex.y > 0){
+            dropItemReturnBool(&pan[i], mouse, ovenHitbox, &ovenIsOn, true);
+        } else if (pan[i].spriteIndex.y < 1){
+            dropItemReturn(&pan[i], mouse);
+        }
+    }
 
     // cake making steps
     for (int i = 0; i < 3; i++){
@@ -105,7 +129,8 @@ void kitchenRender(void){
     DrawTexture(signs, 582, 409, WHITE);
 
     DrawTexture(ovenOff, 1570, 700, WHITE);
-
+    DrawRectangle(ovenHitbox.x, ovenHitbox.y, ovenHitbox.width, ovenHitbox.height, RED); // hitbox for oven
+    if (ovenIsOn == true){ DrawRectangle(50, 50, 100, 100, WHITE); }
     // struct textures for items in kitchen bottom layer
 
     if (batter[2].isPressed == false){ renderItem(&batter[2], batterSheet); }
