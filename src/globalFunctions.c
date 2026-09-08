@@ -75,3 +75,29 @@ void renderItem(Item *item, Texture2D spriteSheet){ // renders item to screen
                         (Vector2){ item->position.x, item->position.y }, 
                         WHITE);
 }
+
+// Texture2D struct: (Raylib struct)
+
+void DrawTextureTimed(float duration, Texture2D texture, Vector2 position){ // draws a texture for a specific amount of time
+    static bool isDrawing = true;
+    static float frame = 0;
+    if (isDrawing) {
+        DrawTexture(texture, position.x, position.y, WHITE);
+        frame += GetFrameTime(); 
+    }
+    if (frame >= duration) {
+        isDrawing = false; frame = 0; 
+    }
+}
+
+void DrawTextureTimedBool(float duration, Texture2D texture, Vector2 position, bool *boolVar, bool trueOrFalse){ // draws a texture for a specific amount of time and changes a bool value
+    static float frame = 0;
+    
+    DrawTexture(texture, position.x, position.y, WHITE);
+    frame += GetFrameTime(); 
+    
+    if (frame >= duration) {
+        *boolVar = trueOrFalse;
+        frame = 0;
+    }
+}

@@ -16,7 +16,6 @@ typedef enum {
     COCONUT_TOPPING,
     STRAWBERRY_TOPPING,
     SPRINKLES_TOPPING,
-
     // none
     NO_LAYER,
 } CakeLayerType;
@@ -50,6 +49,10 @@ static Texture2D triangleCakeSheet;
 bool circleInOven = false; // shape of pan placed in oven
 bool squareInOven = false;
 bool triangleInOven = false;
+
+bool circleOutOven = false; // shape of cake that has been baked
+bool squareOutOven = false;
+bool triangleOutOven = false;
 
 int cakeLayer = 0; // keeps track of how many layers of cake have been added
 
@@ -123,22 +126,21 @@ void unloadKitchen(void){
 }
 
 void cakeLogic(Vector2 mouse){
-    if (circleInOven == true){ cakeLayer1Type = CIRCLE_CAKE; cakeLayer1Flavor = pan[0].spriteIndex.y; }
-    if (squareInOven == true){ cakeLayer1Type = SQUARE_CAKE; cakeLayer1Flavor = pan[1].spriteIndex.y; }
-    if (triangleInOven == true){ cakeLayer1Type = TRIANGLE_CAKE; cakeLayer1Flavor = pan[2].spriteIndex.y; }
+    if (circleOutOven == true){ cakeLayer1Type = CIRCLE_CAKE; cakeLayer1Flavor = pan[0].spriteIndex.y; circleInOven = false; }
+    if (squareOutOven == true){ cakeLayer1Type = SQUARE_CAKE; cakeLayer1Flavor = pan[1].spriteIndex.y; squareInOven = false; }
+    if (triangleOutOven == true){ cakeLayer1Type = TRIANGLE_CAKE; cakeLayer1Flavor = pan[2].spriteIndex.y; triangleInOven = false;}
 
     if (cakeLayer1Type != NO_LAYER && cakeLayer1Type == CIRCLE_CAKE){
-        // cakeLayers[0] = (Item){ { 0, 10 }, { 700, 200 }, { 228, 121 }, { 0, cakeLayer1Flavor }, 0, 0, false };
-        cakeLayers[0] = (Item){ { 700, 200 }, { 700, 200 }, { 228, 121 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
-        circleInOven = false;
+        cakeLayers[0] = (Item){ { 1697, 655 }, { 1697, 655 }, { 243, 105 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
+        circleOutOven = false;
     }
     if (cakeLayer1Type != NO_LAYER && cakeLayer1Type == SQUARE_CAKE){
-        cakeLayers[0] = (Item){ { 700, 200 }, { 700, 200 }, { 250, 105 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
-        squareInOven = false;
+        cakeLayers[0] = (Item){ { 1697, 655 }, { 1697, 655 }, { 243, 105 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
+        squareOutOven = false;
     }
     if (cakeLayer1Type != NO_LAYER && cakeLayer1Type == TRIANGLE_CAKE){
-        cakeLayers[0] = (Item){ { 700, 200 }, { 700, 200 }, { 182, 109 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
-        triangleInOven = false;
+        cakeLayers[0] = (Item){ { 1697, 655 }, { 1697, 655 }, { 243, 105 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
+        triangleOutOven = false;
     }
 }
 
@@ -210,7 +212,13 @@ void kitchenRender(void){
     DrawTexture(signs, 582, 409, WHITE);
 
     DrawTexture(ovenOff, 1570, 700, WHITE);
-    DrawRectangle(ovenHitbox.x, ovenHitbox.y, ovenHitbox.width, ovenHitbox.height, RED); // hitbox for oven
+    
+    // oven on animation
+    if (circleInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &circleOutOven, true); }
+    if (squareInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &squareOutOven, true); }
+    if (triangleInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &triangleOutOven, true); }
+
+    // DrawRectangle(ovenHitbox.x, ovenHitbox.y, ovenHitbox.width, ovenHitbox.height, RED); // hitbox for oven
 
     // struct textures for items in kitchen bottom layer
 

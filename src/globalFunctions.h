@@ -38,4 +38,11 @@ void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle);
 // renders item to screen
 void renderItem(Item *item, Texture2D spriteSheet);
 
+// Texture2D struct: (Raylib struct)
+
+// draws a texture to the screen for a specific amount of time
+void DrawTextureTimed(float duration, Texture2D texture, Vector2 position);
+// draws a texture for a specific amount of time and changes a bool value
+void DrawTextureTimedBool(float duration, Texture2D texture, Vector2 position, bool *boolVar, bool trueOrFalse);
+
 #endif
