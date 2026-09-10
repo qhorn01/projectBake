@@ -54,13 +54,11 @@ bool circleOutOven = false; // shape of cake that has been baked
 bool squareOutOven = false;
 bool triangleOutOven = false;
 
-int cakeLayer = 0; // keeps track of how many layers of cake have been added
+int cakeLayer = 1; // keeps track of how many layers of cake have been added
 
 CakeLayerType cakeLayer1Type = NO_LAYER;
-Flavor cakeLayer1Flavor = NO_FLAVOR;
-
 CakeLayerType cakeLayer2Type = NO_LAYER;
-Flavor cakeLayer2Flavor = NO_FLAVOR;
+CakeLayerType cakeLayer3Type = NO_LAYER;
 
 // structs
         // pos,       defPos,      w&h,  spriteIndex, frame, frameReset, isPressed
@@ -76,7 +74,8 @@ Item pan[3] = {
     { { 1250, 890 }, { 1250, 890 }, { 182, 109 }, { 0, 0 }, 0, 0, false } // triangle
 };
 
-Item cakeLayers[2] = {
+Item cakeLayers[3] = {
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false }
 };
@@ -125,27 +124,41 @@ void unloadKitchen(void){
     UnloadTexture(triangleCakeSheet);
 }
 
-void cakeLogic(Vector2 mouse){
-    if (circleOutOven == true){ cakeLayer1Type = CIRCLE_CAKE; cakeLayer1Flavor = pan[0].spriteIndex.y; circleInOven = false; }
-    if (squareOutOven == true){ cakeLayer1Type = SQUARE_CAKE; cakeLayer1Flavor = pan[1].spriteIndex.y; squareInOven = false; }
-    if (triangleOutOven == true){ cakeLayer1Type = TRIANGLE_CAKE; cakeLayer1Flavor = pan[2].spriteIndex.y; triangleInOven = false;}
+void cakeStack(bool *shapeOutOven, bool *shapeInOven, CakeLayerType *cakeLayerType, int cakeLayerTypeNumber, float y, float offsetY, int panIndex, int cakeLayerIndex){
+    if (*shapeOutOven == true){
+        *cakeLayerType = cakeLayerTypeNumber;
+        *shapeInOven = false;
+        cakeLayer++;
 
-    if (cakeLayer1Type != NO_LAYER && cakeLayer1Type == CIRCLE_CAKE){
-        cakeLayers[0] = (Item){ { 1697, 655 }, { 1697, 655 }, { 243, 105 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
-        circleOutOven = false;
+        cakeLayers[cakeLayerIndex] = (Item){ { 1697, y - offsetY }, { 1697, y - offsetY }, { 243, 105 }, { 0, (pan[panIndex].spriteIndex.y - 1) }, 0, 0, false };
+        *shapeOutOven = false;
     }
-    if (cakeLayer1Type != NO_LAYER && cakeLayer1Type == SQUARE_CAKE){
-        cakeLayers[0] = (Item){ { 1697, 655 }, { 1697, 655 }, { 243, 105 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
-        squareOutOven = false;
-    }
-    if (cakeLayer1Type != NO_LAYER && cakeLayer1Type == TRIANGLE_CAKE){
-        cakeLayers[0] = (Item){ { 1697, 655 }, { 1697, 655 }, { 243, 105 }, { 0, (cakeLayer1Flavor - 1) }, 0, 0, false };
-        triangleOutOven = false;
+}
+
+void cakeLogic(Vector2 mouse){
+    switch(cakeLayer){
+        case 1:
+            // bool *shapeOutOven, CakeLayerType *cakeLayerType, int cakeLayerTypeNumber, float y, float offsetY, int panIndex, int cakeLayerIndex
+            cakeStack(&circleOutOven, &circleInOven, &cakeLayer1Type, 0, 655, 0, 0, 0);
+            cakeStack(&squareOutOven, &squareInOven, &cakeLayer1Type, 1, 655, 0, 1, 0);
+            cakeStack(&triangleOutOven, &triangleInOven, &cakeLayer1Type, 2, 655, 0, 2, 0);
+            break;
+        case 2:
+            cakeStack(&circleOutOven, &circleInOven, &cakeLayer2Type, 0, cakeLayers[0].position.y, 55, 0, 1);
+            cakeStack(&squareOutOven, &squareInOven, &cakeLayer2Type, 1, cakeLayers[0].position.y, 55, 1, 1);
+            cakeStack(&triangleOutOven, &triangleInOven, &cakeLayer2Type, 2, cakeLayers[0].position.y, 55, 2, 1);
+            break;
+        case 3:
+            cakeStack(&circleOutOven, &circleInOven, &cakeLayer3Type, 0, cakeLayers[1].position.y, 55, 0, 2);
+            cakeStack(&squareOutOven, &squareInOven, &cakeLayer3Type, 1, cakeLayers[1].position.y, 55, 1, 2);
+            cakeStack(&triangleOutOven, &triangleInOven, &cakeLayer3Type, 2, cakeLayers[1].position.y, 55, 2, 2);
+            break;
     }
 }
 
 void cakeRender(void){
     if (cakeLayer1Type != NO_LAYER) {
+
         if (cakeLayer1Type == CIRCLE_CAKE){
             renderItem(&cakeLayers[0], circleCakeSheet);
         } 
@@ -156,6 +169,32 @@ void cakeRender(void){
             renderItem(&cakeLayers[0], triangleCakeSheet);
         }
     }
+    
+    if (cakeLayer2Type != NO_LAYER) {
+
+        if (cakeLayer2Type == CIRCLE_CAKE){
+            renderItem(&cakeLayers[1], circleCakeSheet);
+        } 
+        else if (cakeLayer2Type == SQUARE_CAKE){
+            renderItem(&cakeLayers[1], squareCakeSheet);
+        } 
+        else if (cakeLayer2Type == TRIANGLE_CAKE){
+            renderItem(&cakeLayers[1], triangleCakeSheet);
+        }
+    }
+
+    if (cakeLayer3Type != NO_LAYER) {
+
+        if (cakeLayer3Type == CIRCLE_CAKE){
+            renderItem(&cakeLayers[2], circleCakeSheet);
+        } 
+        else if (cakeLayer3Type == SQUARE_CAKE){
+            renderItem(&cakeLayers[2], squareCakeSheet);
+        } 
+        else if (cakeLayer3Type == TRIANGLE_CAKE){
+            renderItem(&cakeLayers[2], triangleCakeSheet);
+        }
+    }
 }
 
 void kitchenLogic(GameState *currentState, Vector2 mouse){
@@ -163,16 +202,21 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
     // Item *item, float offsetX, float offsetY, float hitboxX, float hitboxY, float hitboxW, float hitboxH, Vector2 mouse
     
     // drop item logic located under cake making steps
-    for (int i = 0; i < 3; i++){ dragItemOffset(&batter[i], 93, (batter[i].dimensions.y / 2), 45, 0, 86, 103, mouse); }
+    if (circleInOven == false && squareInOven == false && triangleInOven == false){
+        for (int i = 0; i < 3; i++){ dragItemOffset(&batter[i], 93, (batter[i].dimensions.y / 2), 45, 0, 86, 103, mouse); }
+    }
     // pan items
     for (int i = 0; i < 3; i++){ 
-        dragItem(&pan[i], mouse); 
-        if (pan[i].spriteIndex.y > 0 && i == 0){
+        if (circleInOven == false && squareInOven == false && triangleInOven == false){ dragItem(&pan[i], mouse); }
+        if (pan[i].spriteIndex.y > 0 && i == 0 && cakeLayer < 4){
             dropItemReturnBool(&pan[i], mouse, ovenHitbox, &circleInOven, true);
-        } else if (pan[i].spriteIndex.y > 0 && i == 1){
+
+        } else if (pan[i].spriteIndex.y > 0 && i == 1 && cakeLayer < 4){
             dropItemReturnBool(&pan[i], mouse, ovenHitbox, &squareInOven, true);
-        } else if (pan[i].spriteIndex.y > 0 && i == 2){
+
+        } else if (pan[i].spriteIndex.y > 0 && i == 2 && cakeLayer < 4){
             dropItemReturnBool(&pan[i], mouse, ovenHitbox, &triangleInOven, true);
+
         } else {
             dropItemReturn(&pan[i], mouse);
         }
@@ -213,6 +257,8 @@ void kitchenRender(void){
 
     DrawTexture(ovenOff, 1570, 700, WHITE);
     
+    DrawText(TextFormat("cake layer: %i", cakeLayer), 20, 20, 20, MAROON);
+
     // oven on animation
     if (circleInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &circleOutOven, true); }
     if (squareInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &squareOutOven, true); }
