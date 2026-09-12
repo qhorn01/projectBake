@@ -20,13 +20,6 @@ typedef enum {
     NO_LAYER,
 } CakeLayerType;
 
-typedef enum {
-    NO_FLAVOR = 0,
-    VANILLA = 1,
-    CHOCOLATE = 2,
-    STRAWBERRY = 3,
-} Flavor;
-
 // textures
 static Texture2D background;
 static Texture2D counter;
@@ -35,6 +28,7 @@ static Texture2D containersTopLayer;
 static Texture2D signs;
 static Texture2D ovenOff;
 static Texture2D ovenOn;
+static Texture2D cart;
 // struct textures for items in kitchen
 static Texture2D batterSheet;
 static Texture2D circlePanSheet;
@@ -44,7 +38,6 @@ static Texture2D trianglePanSheet;
 static Texture2D circleCakeSheet;
 static Texture2D squareCakeSheet;
 static Texture2D triangleCakeSheet;
-
 // variables
 bool circleInOven = false; // shape of pan placed in oven
 bool squareInOven = false;
@@ -53,6 +46,8 @@ bool triangleInOven = false;
 bool circleOutOven = false; // shape of cake that has been baked
 bool squareOutOven = false;
 bool triangleOutOven = false;
+
+bool cakeReset = false;
 
 int cakeLayer = 1; // keeps track of how many layers of cake have been added
 
@@ -81,6 +76,7 @@ Item cakeLayers[3] = {
 };
 
 Rectangle ovenHitbox = { 1650, 920, 345, 200 }; // hitbox for oven
+Rectangle cartHitbox = {2229, 620, 260, 214}; // hitbox for placing cake on cart
 
 void initKitchen(void){
     background = LoadTexture("assets/kitchen/kitchenBg.png");
@@ -91,6 +87,8 @@ void initKitchen(void){
 
     ovenOff = LoadTexture("assets/kitchen/ovenOff.png");
     ovenOn = LoadTexture("assets/kitchen/ovenOn.png");
+
+    cart = LoadTexture("assets/kitchen/cart.png");
 
     // struct textures for items in kitchen
     batterSheet = LoadTexture("assets/kitchen/items/batter.png");
@@ -113,6 +111,8 @@ void unloadKitchen(void){
 
     UnloadTexture(ovenOff);
     UnloadTexture(ovenOn);
+
+    UnloadTexture(cart);
     // struct textures for items in kitchen
     UnloadTexture(batterSheet);
     UnloadTexture(circlePanSheet);
@@ -245,6 +245,34 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
 
     cakeLogic(mouse);
 
+    // logic for carrying all of the cakes
+    if (circleInOven == false && squareInOven == false && triangleInOven == false){
+        dragItemOffset(&cakeLayers[0], 121, 50, 0, -105, 243, 210, mouse);
+        dropItemReturnBool(&cakeLayers[0], mouse, cartHitbox, &cakeReset, true);
+    }
+    if (cakeLayers[0].isPressed == true){
+        cakeLayers[1].position.x = cakeLayers[0].position.x;
+        cakeLayers[1].position.y = cakeLayers[0].position.y - 55;
+
+        cakeLayers[2].position.x = cakeLayers[1].position.x;
+        cakeLayers[2].position.y = cakeLayers[1].position.y - 55;
+    } else if (cakeLayers[0].isPressed == false){
+        cakeLayers[1].position.x = cakeLayers[1].defaultPosition.x;
+        cakeLayers[1].position.y = cakeLayers[1].defaultPosition.y;
+
+        cakeLayers[2].position.x = cakeLayers[2].defaultPosition.x;
+        cakeLayers[2].position.y = cakeLayers[2].defaultPosition.y;
+    }
+    // logic for dropping the cakes onto the cart and resetting the cake layers
+    if (cakeReset == true){
+        for (int i = 0; i < 3; i++){ cakeLayers[i] = (Item){ {0}, {0}, {0}, { 0, 0 }, 0, 0, false }; }
+        cakeLayer = 1;
+        cakeLayer1Type = NO_LAYER;
+        cakeLayer2Type = NO_LAYER;
+        cakeLayer3Type = NO_LAYER;
+        cakeReset = false;
+    }
+
 } // end kitchenLogic
 
 void kitchenRender(void){
@@ -256,13 +284,13 @@ void kitchenRender(void){
     DrawTexture(signs, 582, 409, WHITE);
 
     DrawTexture(ovenOff, 1570, 700, WHITE);
-    
-    DrawText(TextFormat("cake layer: %i", cakeLayer), 20, 20, 20, MAROON);
-
+    // DrawText(TextFormat("cake layer: %i", cakeLayer), 20, 20, 20, MAROON);
     // oven on animation
     if (circleInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &circleOutOven, true); }
     if (squareInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &squareOutOven, true); }
     if (triangleInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &triangleOutOven, true); }
+
+    DrawTexture(cart, 2025, 675, WHITE);
 
     // DrawRectangle(ovenHitbox.x, ovenHitbox.y, ovenHitbox.width, ovenHitbox.height, RED); // hitbox for oven
 
