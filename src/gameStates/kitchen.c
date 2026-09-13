@@ -65,9 +65,9 @@ Item batter[3] = {
 };
         // pos,       defPos,      w&h,  spriteIndex, frame, frameReset, isPressed
 Item icing[3] = {
-    { { 900, 590 }, { 900, 590 }, { 88, 170 }, { 0, 0 }, 0, 0, false }, // vanilla
-    { { 1000, 590 }, { 1000, 590 }, { 88, 170 }, { 0, 1 }, 0, 0, false }, // chocolate
-    { { 1100, 590 }, { 1100, 590 }, { 88, 170 }, { 0, 2 }, 0, 0, false } // strawberry
+    { { 888, 556 }, { 888, 556 }, { 88, 170 }, { 0, 0 }, 0, 0, false }, // vanilla
+    { { 987, 556 }, { 987, 556 }, { 88, 170 }, { 0, 1 }, 0, 0, false }, // chocolate
+    { { 1086, 556 }, { 1086, 556 }, { 88, 170 }, { 0, 2 }, 0, 0, false } // strawberry
 };
         // pos,        defPos,       w&h,    spriteIndex, frame, frameReset, isPressed
 Item pan[3] = {

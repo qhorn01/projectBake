@@ -40,8 +40,10 @@ void dragItemOffset(Item *item, float offsetX, float offsetY, float hitboxX, flo
 
 void dropItemReturn(Item *item, Vector2 mouse){ // returns item to default position when left mouse button is released
     if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-        item->position = item->defaultPosition;
-        item->isPressed = false;
+        if (item->isPressed == true){
+            item->position = item->defaultPosition;
+            item->isPressed = false;
+        }
     }
 }
 
