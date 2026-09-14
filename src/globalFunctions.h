@@ -33,6 +33,12 @@ void dragItemOffset(Item *item, float offsetX, float offsetY, float hitboxX, flo
 void dropItemReturn(Item *item, Vector2 mouse);
 // changes a bool value when an item is dropped in a specific place
 void dropItemReturnBool(Item *item, Vector2 mouse, Rectangle rectangle, bool *boolVar, bool trueOrFalse);
+// changes a int value when an item is dropped in a specific place
+void dropItemReturnInt(Item *item, Vector2 mouse, Rectangle rectangle, int *integer, int num);
+// changes a float value when an item is dropped in a specific place
+void dropItemReturnFloat(Item *item, Vector2 mouse, Rectangle rectangle, float *integer, float num);
+// changes a bool and int value when an item is dropped in a specific place
+void dropItemReturnBoolInt(Item *item, Vector2 mouse, Rectangle rectangle, bool *boolVar, bool trueOrFalse, int *integer, int num);
 // allows players to place item in a specific place
 void dropItemSnap(Item *item, Vector2 mouse, Rectangle rectangle);
 // renders item to screen

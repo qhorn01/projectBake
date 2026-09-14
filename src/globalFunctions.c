@@ -39,11 +39,9 @@ void dragItemOffset(Item *item, float offsetX, float offsetY, float hitboxX, flo
 }
 
 void dropItemReturn(Item *item, Vector2 mouse){ // returns item to default position when left mouse button is released
-    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-        if (item->isPressed == true){
-            item->position = item->defaultPosition;
-            item->isPressed = false;
-        }
+    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && item->isPressed == true){
+        item->position = item->defaultPosition;
+        item->isPressed = false;
     }
 }
 
@@ -53,6 +51,39 @@ void dropItemReturnBool(Item *item, Vector2 mouse, Rectangle rectangle, bool *bo
             *boolVar = trueOrFalse;
         } else {
             *boolVar = !trueOrFalse;
+        }
+        item->position = item->defaultPosition;
+        item->isPressed = false;
+    }
+}
+
+void dropItemReturnBoolInt(Item *item, Vector2 mouse, Rectangle rectangle, bool *boolVar, bool trueOrFalse, int *integer, int num){ // changes a bool value when an item is dropped in a specific place
+    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && item->isPressed == true){
+        if(CheckCollisionPointRec(mouse, rectangle)){
+            *integer = num;
+            *boolVar = trueOrFalse;
+        } else {
+            *boolVar = !trueOrFalse;
+        }
+        item->position = item->defaultPosition;
+        item->isPressed = false;
+    }
+}
+
+void dropItemReturnInt(Item *item, Vector2 mouse, Rectangle rectangle, int *integer, int num){ // changes a bool value when an item is dropped in a specific place
+    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && item->isPressed == true){
+        if(CheckCollisionPointRec(mouse, rectangle)){
+            *integer = num;
+        }
+        item->position = item->defaultPosition;
+        item->isPressed = false;
+    }
+}
+
+void dropItemReturnFloat(Item *item, Vector2 mouse, Rectangle rectangle, float *integer, float num){ // changes a bool value when an item is dropped in a specific place
+    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && item->isPressed == true){
+        if(CheckCollisionPointRec(mouse, rectangle)){
+            *integer = num;
         }
         item->position = item->defaultPosition;
         item->isPressed = false;

@@ -21,8 +21,8 @@
 int main()
 {
     // Initialization
-    const int screenWidth = 150;
-    const int screenHeight = 150;
+    const int screenWidth = 1280;
+    const int screenHeight = 720;
 
     // Enable config flags for resizable window and vertical synchro
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
