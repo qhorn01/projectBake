@@ -134,3 +134,15 @@ void DrawTextureTimedBool(float duration, Texture2D texture, Vector2 position, b
         frame = 0;
     }
 }
+
+void DrawTextureTimedInt(float duration, Texture2D texture, Vector2 position, int *intVar, int num){
+    static float frame = 0;
+    
+    DrawTexture(texture, position.x, position.y, WHITE);
+    frame += GetFrameTime(); 
+    
+    if (frame >= duration) {
+        *intVar = num;
+        frame = 0;
+    }
+}

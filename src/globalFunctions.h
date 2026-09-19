@@ -50,5 +50,7 @@ void renderItem(Item *item, Texture2D spriteSheet);
 void DrawTextureTimed(float duration, Texture2D texture, Vector2 position);
 // draws a texture for a specific amount of time and changes a bool value
 void DrawTextureTimedBool(float duration, Texture2D texture, Vector2 position, bool *boolVar, bool trueOrFalse);
+// draws a texture for a specific amount of time and changes an int value
+void DrawTextureTimedInt(float duration, Texture2D texture, Vector2 position, int *intVar, int num);
 
 #endif
