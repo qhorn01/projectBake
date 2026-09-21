@@ -101,7 +101,8 @@ Item icingLayers[3] = {
 };
 
 Rectangle ovenHitbox = { 1650, 920, 345, 200 }; // hitbox for oven
-Rectangle cartHitbox = {2229, 620, 260, 214}; // hitbox for placing cake on cart
+Rectangle cakeHitbox = { 1667, 400, 290, 350 }; // hitbox that covers where the cake is made above the oven
+Rectangle cartHitbox = { 2229, 620, 260, 214 }; // hitbox for placing cake on cart
 
 void initKitchen(void){
     background = LoadTexture("assets/kitchen/kitchenBg.png");
@@ -202,6 +203,8 @@ void cakeLogic(Vector2 mouse){
             cakeStack(&squareOutOven, &squareInOven, &cakeLayer3Type, 1, cakeLayers[1].position.y, 55, 1, 2);
             cakeStack(&starOutOven, &starInOven, &cakeLayer3Type, 2, cakeLayers[1].position.y, 55, 2, 2);
             break;
+        case 4:
+            icingStack(&icingLayer3Type, &cakeLayer3Type, 2, cakeLayers[2].position.y, 0, icingFlavorIndex);
     }
 }
 
@@ -266,6 +269,17 @@ void cakeRender(void){
             renderItem(&cakeLayers[2], starCakeSheet);
         }
     }
+    if (icingLayer3Type != NO_LAYER){
+        if (icingLayer3Type == CIRCLE_CAKE + 3){
+            renderItem(&icingLayers[2], circleIcingSheet);
+        }
+        else if (icingLayer3Type == SQUARE_CAKE + 3){
+            renderItem(&icingLayers[2], squareIcingSheet);
+        } 
+        else if (icingLayer3Type == STAR_CAKE + 3){
+            renderItem(&icingLayers[2], starIcingSheet);
+        }
+    }
 }
 
 void kitchenLogic(GameState *currentState, Vector2 mouse){
@@ -303,7 +317,7 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
     }
     for (int i = 0; i < 3; i++){
         if (cakeLayer > 1){
-                dropItemReturnBoolInt(&icing[i], mouse, cartHitbox, &icingOnCake, true, &icingFlavorIndex, i);
+                dropItemReturnBoolInt(&icing[i], mouse, cakeHitbox, &icingOnCake, true, &icingFlavorIndex, i);
         } else {
             dropItemReturn(&icing[i], mouse);
         }
@@ -334,41 +348,52 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
         dropItemReturnBool(&cakeLayers[0], mouse, cartHitbox, &cakeReset, true);
     }
     if (cakeLayers[0].isPressed == true){
+        icingLayers[0].position.x = cakeLayers[0].position.x;
+        icingLayers[0].position.y = cakeLayers[0].position.y;
+
         cakeLayers[1].position.x = cakeLayers[0].position.x;
         cakeLayers[1].position.y = cakeLayers[0].position.y - 55;
         
-        icingLayers[0].position.x = cakeLayers[0].position.x;
-        icingLayers[0].position.y = cakeLayers[0].position.y;
+        icingLayers[1].position.x = cakeLayers[1].position.x;
+        icingLayers[1].position.y = cakeLayers[1].position.y;
 
         cakeLayers[2].position.x = cakeLayers[1].position.x;
         cakeLayers[2].position.y = cakeLayers[1].position.y - 55;
 
-        icingLayers[1].position.x = cakeLayers[1].position.x;
-        icingLayers[1].position.y = cakeLayers[1].position.y;
+        icingLayers[2].position.x = cakeLayers[2].position.x;
+        icingLayers[2].position.y = cakeLayers[2].position.y;
+        
     } else if (cakeLayers[0].isPressed == false){ // sends back to default positions after releasing left click
+        icingLayers[0].position.x = cakeLayers[0].defaultPosition.x;
+        icingLayers[0].position.y = cakeLayers[0].defaultPosition.y;
+
         cakeLayers[1].position.x = cakeLayers[1].defaultPosition.x;
         cakeLayers[1].position.y = cakeLayers[1].defaultPosition.y;
 
-        icingLayers[0].position.x = cakeLayers[0].defaultPosition.x;
-        icingLayers[0].position.y = cakeLayers[0].defaultPosition.y;
+        icingLayers[1].position.x = cakeLayers[1].defaultPosition.x;
+        icingLayers[1].position.y = cakeLayers[1].defaultPosition.y;
 
         cakeLayers[2].position.x = cakeLayers[2].defaultPosition.x;
         cakeLayers[2].position.y = cakeLayers[2].defaultPosition.y;
 
-        icingLayers[1].position.x = cakeLayers[1].defaultPosition.x;
-        icingLayers[1].position.y = cakeLayers[1].defaultPosition.y;
+        icingLayers[2].position.x = cakeLayers[2].defaultPosition.x;
+        icingLayers[2].position.y = cakeLayers[2].defaultPosition.y;
     }
 
     // logic for dropping the cakes onto the cart and resetting the cake layers
     if (cakeReset == true){
         for (int i = 0; i < 3; i++){ cakeLayers[i] = (Item){ {0}, {0}, {0}, { 0, 0 }, 0, 0, false }; }
         cakeLayer = 1;
+        
         cakeLayer1Type = NO_LAYER;
         icingLayer1Type = NO_LAYER;
+        
         cakeLayer2Type = NO_LAYER;
         icingLayer2Type = NO_LAYER;
+
         cakeLayer3Type = NO_LAYER;
         icingLayer3Type = NO_LAYER;
+        
         cakeReset = false;
     }
 
@@ -383,8 +408,6 @@ void kitchenRender(void){
     DrawTexture(signs, 582, 409, WHITE);
 
     DrawTexture(ovenOff, 1570, 700, WHITE);
-    DrawText(TextFormat("icing flavor: %i", icingFlavorIndex), 20, 20, 50, MAROON);
-    DrawText(TextFormat("icing bool: %i", icingOnCake), 20, 70, 50, MAROON);
     // oven on animation
     if (circleInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &circleOutOven, true); }
     if (squareInOven == true){ DrawTextureTimedBool(1.0f, ovenOn, (Vector2){ 1570, 700 }, &squareOutOven, true); }
@@ -426,4 +449,10 @@ void kitchenRender(void){
     if (pan[2].isPressed == true){ renderItem(&pan[2], starPanSheet); }
     if (pan[1].isPressed == true){ renderItem(&pan[1], squarePanSheet); }
     if (pan[0].isPressed == true){ renderItem(&pan[0], circlePanSheet); }
+
+    // debugging
+    DrawText(TextFormat("icing flavor: %i", icingFlavorIndex), 20, 20, 50, MAROON);
+    DrawText(TextFormat("icing bool: %i", icingOnCake), 20, 70, 50, MAROON);
+
+    // DrawRectangle(cakeHitbox.x, cakeHitbox.y, cakeHitbox.width, cakeHitbox.height, WHITE);
 } // end kitchenRender
