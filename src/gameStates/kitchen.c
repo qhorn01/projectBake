@@ -52,7 +52,10 @@ bool squareOutOven = false;
 bool starOutOven = false;
 
 bool icingOnCake = false; // detects whether or not player dragged and dropped icing over existing cake layer
-int icingFlavorIndex = 0;
+int icingFlavorIndex = 0; // tracks the specific icing flavor to add to the cake
+
+bool toppingOnCake = false; // detects whether player has dragged and dropped topping over existing cake/icing layer
+int toppingFlavorIndex = 0; // tracks the specific topping to add to the cake
 
 bool cakeReset = false;
 
@@ -61,10 +64,24 @@ int cakeLayer = 1; // keeps track of how many layers of cake have been added
 LayerType cakeLayer1Type = NO_LAYER;
 LayerType cakeLayer2Type = NO_LAYER;
 LayerType cakeLayer3Type = NO_LAYER;
+LayerType cakeLayer4Type = NO_LAYER;
+LayerType cakeLayer5Type = NO_LAYER;
+LayerType cakeLayer6Type = NO_LAYER;
 
 LayerType icingLayer1Type = NO_LAYER;
 LayerType icingLayer2Type = NO_LAYER;
 LayerType icingLayer3Type = NO_LAYER;
+LayerType icingLayer4Type = NO_LAYER;
+LayerType icingLayer5Type = NO_LAYER;
+LayerType icingLayer6Type = NO_LAYER;
+
+LayerType toppingsLayer1Type = NO_LAYER;
+LayerType toppingsLayer2Type = NO_LAYER;
+LayerType toppingsLayer3Type = NO_LAYER;
+LayerType toppingsLayer4Type = NO_LAYER;
+LayerType toppingsLayer5Type = NO_LAYER;
+LayerType toppingsLayer6Type = NO_LAYER;
+
 
 LayerType toppingsType = NO_LAYER;
 // structs
@@ -88,24 +105,33 @@ Item pan[3] = {
 };
         // pos,        defPos,       w&h,    spriteIndex, frame, frameReset, isPressed
 Item topping[3] = {
-    { { 1167/* - 40 */, 672 }, { 1167, 672 }, { 243, 105 }, { 0, 0 }, 0, 0, false }, // strawberry
+    { { 1167, 672 }, { 1167, 672 }, { 243, 105 }, { 0, 0 }, 0, 0, false }, // strawberry
     { { 1262, 672 }, { 1262, 672 }, { 243, 105 }, { 0, 1 }, 0, 0, false }, // coconut
     { { 1355, 672 }, { 1355, 672 }, { 243, 105 }, { 0, 2 }, 0, 0, false } // sprinkles
 };
 
-Item cakeLayers[3] = {
+Item cakeLayers[6] = {
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
-    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false }
-};
-
-Item icingLayers[3] = {
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false }
 };
 
-Item toppingsLayer[3] = {
+Item icingLayers[6] = {
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false }
+};
+
+Item toppingsLayer[6] = {
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
+    { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false },
     { {0}, {0}, {0}, { 0, 0 }, 0, 0, false }
@@ -181,6 +207,13 @@ void cakeStack(bool *shapeOutOven, bool *shapeInOven, LayerType *cakeLayerType, 
         *shapeInOven = false;
         cakeLayer++;
 
+        toppingsLayer1Type = NO_LAYER;
+        toppingsLayer2Type = NO_LAYER;
+        toppingsLayer3Type = NO_LAYER;
+        toppingsLayer4Type = NO_LAYER;
+        toppingsLayer5Type = NO_LAYER;
+        toppingsLayer6Type = NO_LAYER;
+
         cakeLayers[cakeLayerIndex] = (Item){ { 1697, y - offsetY }, { 1697, y - offsetY }, { 243, 105 }, { 0, (pan[panIndex].spriteIndex.y - 1) }, 0, 0, false };
         *shapeOutOven = false;
     }
@@ -190,17 +223,29 @@ void icingStack(LayerType *icingLayerType, LayerType *cakeLayerType, int icingLa
     if (cakeLayer >= 2 && icingOnCake == true){
         *icingLayerType = *cakeLayerType;
         icingLayers[icingLayerIndex] = (Item){ { 1697, y - (offsetY * cakeLayer - 1) }, { 1697, y - (offsetY * cakeLayer - 1) }, { 243, 105 }, { 0, icingFlavorIndex }, 0, 0, false };
+
+        toppingsLayer1Type = NO_LAYER;
+        toppingsLayer2Type = NO_LAYER;
+        toppingsLayer3Type = NO_LAYER;
+        toppingsLayer4Type = NO_LAYER;
+        toppingsLayer5Type = NO_LAYER;
+        toppingsLayer6Type = NO_LAYER;
+        
         icingOnCake = false;
     } else {
         icingOnCake = false;
     }
 }
 
-/*
-void toppingsStack(){
-    
+void toppingsStack(LayerType *toppingsType, int toppingFlavorIndex, int toppingsLayerIndex, float y, float offsetY){
+    if (cakeLayer >= 2 && toppingOnCake == true){
+        *toppingsType = toppingFlavorIndex + 3; // + 3 offsets it to topping types rather than shape types
+        toppingsLayer[toppingsLayerIndex] = (Item){ { 1697, y - (offsetY * cakeLayer - 1) }, { 1697, y - (offsetY * cakeLayer - 1) }, { 243, 105 }, { 0, toppingFlavorIndex }, 0, 0, false };
+        toppingOnCake = false;
+    } else{
+        toppingOnCake = false;
+    }
 }
-*/
 
 void cakeLogic(Vector2 mouse){
     switch(cakeLayer){
@@ -212,6 +257,7 @@ void cakeLogic(Vector2 mouse){
             break;
         case 2:
             icingStack(&icingLayer1Type, &cakeLayer1Type, 0, cakeLayers[0].position.y, 0, icingFlavorIndex);
+            toppingsStack(&toppingsLayer1Type, toppingFlavorIndex, 0, cakeLayers[0].position.y, 0);
 
             cakeStack(&circleOutOven, &circleInOven, &cakeLayer2Type, 0, cakeLayers[0].position.y, 55, 0, 1);
             cakeStack(&squareOutOven, &squareInOven, &cakeLayer2Type, 1, cakeLayers[0].position.y, 55, 1, 1);
@@ -219,6 +265,7 @@ void cakeLogic(Vector2 mouse){
             break;
         case 3:
             icingStack(&icingLayer2Type, &cakeLayer2Type, 1, cakeLayers[1].position.y, 0, icingFlavorIndex);
+            toppingsStack(&toppingsLayer2Type, toppingFlavorIndex, 1, cakeLayers[1].position.y, 0);
 
             cakeStack(&circleOutOven, &circleInOven, &cakeLayer3Type, 0, cakeLayers[1].position.y, 55, 0, 2);
             cakeStack(&squareOutOven, &squareInOven, &cakeLayer3Type, 1, cakeLayers[1].position.y, 55, 1, 2);
@@ -226,10 +273,39 @@ void cakeLogic(Vector2 mouse){
             break;
         case 4:
             icingStack(&icingLayer3Type, &cakeLayer3Type, 2, cakeLayers[2].position.y, 0, icingFlavorIndex);
+            toppingsStack(&toppingsLayer3Type, toppingFlavorIndex, 2, cakeLayers[2].position.y, 0);
+
+            cakeStack(&circleOutOven, &circleInOven, &cakeLayer4Type, 0, cakeLayers[2].position.y, 55, 0, 3);
+            cakeStack(&squareOutOven, &squareInOven, &cakeLayer4Type, 1, cakeLayers[2].position.y, 55, 1, 3);
+            cakeStack(&starOutOven, &starInOven, &cakeLayer4Type, 2, cakeLayers[2].position.y, 55, 2, 3);
+            break;
+        case 5:
+            icingStack(&icingLayer4Type, &cakeLayer4Type, 3, cakeLayers[3].position.y, 0, icingFlavorIndex);
+            toppingsStack(&toppingsLayer4Type, toppingFlavorIndex, 3, cakeLayers[3].position.y, 0);
+
+            cakeStack(&circleOutOven, &circleInOven, &cakeLayer5Type, 0, cakeLayers[3].position.y, 55, 0, 4);
+            cakeStack(&squareOutOven, &squareInOven, &cakeLayer5Type, 1, cakeLayers[3].position.y, 55, 1, 4);
+            cakeStack(&starOutOven, &starInOven, &cakeLayer5Type, 2, cakeLayers[3].position.y, 55, 2, 4);
+            break;
+        case 6:
+            icingStack(&icingLayer5Type, &cakeLayer5Type, 4, cakeLayers[4].position.y, 0, icingFlavorIndex);
+            toppingsStack(&toppingsLayer5Type, toppingFlavorIndex, 4, cakeLayers[4].position.y, 0);
+
+            cakeStack(&circleOutOven, &circleInOven, &cakeLayer6Type, 0, cakeLayers[4].position.y, 55, 0, 5);
+            cakeStack(&squareOutOven, &squareInOven, &cakeLayer6Type, 1, cakeLayers[4].position.y, 55, 1, 5);
+            cakeStack(&starOutOven, &starInOven, &cakeLayer6Type, 2, cakeLayers[4].position.y, 55, 2, 5);
+            break;
+        case 7:
+            icingStack(&icingLayer6Type, &cakeLayer6Type, 5, cakeLayers[4].position.y, 0, icingFlavorIndex);
+            toppingsStack(&toppingsLayer6Type, toppingFlavorIndex, 5, cakeLayers[4].position.y, 0);
+            break;
+        default:
+            break;
     }
 }
 
 void cakeRender(void){
+    // layer 1
     if (cakeLayer1Type != NO_LAYER) {
 
         if (cakeLayer1Type == CIRCLE){
@@ -253,7 +329,10 @@ void cakeRender(void){
             renderItem(&icingLayers[0], starIcingSheet);
         }
     }
-    
+    if (toppingsLayer1Type != NO_LAYER){
+        renderItem(&toppingsLayer[0], toppingsSheet);
+    }
+    // layer 2
     if (cakeLayer2Type != NO_LAYER) {
 
         if (cakeLayer2Type == CIRCLE){
@@ -277,7 +356,10 @@ void cakeRender(void){
             renderItem(&icingLayers[1], starIcingSheet);
         }
     }
-
+    if (toppingsLayer2Type != NO_LAYER){
+        renderItem(&toppingsLayer[1], toppingsSheet);
+    }
+    // layer 3
     if (cakeLayer3Type != NO_LAYER) {
 
         if (cakeLayer3Type == CIRCLE){
@@ -300,6 +382,90 @@ void cakeRender(void){
         else if (icingLayer3Type == STAR){
             renderItem(&icingLayers[2], starIcingSheet);
         }
+    }
+    if (toppingsLayer3Type != NO_LAYER){
+        renderItem(&toppingsLayer[2], toppingsSheet);
+    }
+    // layer 4
+    if (cakeLayer4Type != NO_LAYER) {
+
+        if (cakeLayer4Type == CIRCLE){
+            renderItem(&cakeLayers[3], circleCakeSheet);
+        } 
+        else if (cakeLayer4Type == SQUARE){
+            renderItem(&cakeLayers[3], squareCakeSheet);
+        } 
+        else if (cakeLayer4Type == STAR){
+            renderItem(&cakeLayers[3], starCakeSheet);
+        }
+    }
+    if (icingLayer4Type != NO_LAYER){
+        if (icingLayer4Type == CIRCLE){
+            renderItem(&icingLayers[3], circleIcingSheet);
+        }
+        else if (icingLayer4Type == SQUARE){
+            renderItem(&icingLayers[3], squareIcingSheet);
+        } 
+        else if (icingLayer4Type == STAR){
+            renderItem(&icingLayers[3], starIcingSheet);
+        }
+    }
+    if (toppingsLayer4Type != NO_LAYER){
+        renderItem(&toppingsLayer[3], toppingsSheet);
+    }
+    // layer 5
+    if (cakeLayer5Type != NO_LAYER) {
+
+        if (cakeLayer5Type == CIRCLE){
+            renderItem(&cakeLayers[4], circleCakeSheet);
+        } 
+        else if (cakeLayer5Type == SQUARE){
+            renderItem(&cakeLayers[4], squareCakeSheet);
+        } 
+        else if (cakeLayer5Type == STAR){
+            renderItem(&cakeLayers[4], starCakeSheet);
+        }
+    }
+    if (icingLayer5Type != NO_LAYER){
+        if (icingLayer5Type == CIRCLE){
+            renderItem(&icingLayers[4], circleIcingSheet);
+        }
+        else if (icingLayer5Type == SQUARE){
+            renderItem(&icingLayers[4], squareIcingSheet);
+        } 
+        else if (icingLayer5Type == STAR){
+            renderItem(&icingLayers[4], starIcingSheet);
+        }
+    }
+    if (toppingsLayer5Type != NO_LAYER){
+        renderItem(&toppingsLayer[4], toppingsSheet);
+    }
+    // layer 6
+    if (cakeLayer6Type != NO_LAYER) {
+
+        if (cakeLayer6Type == CIRCLE){
+            renderItem(&cakeLayers[5], circleCakeSheet);
+        } 
+        else if (cakeLayer6Type == SQUARE){
+            renderItem(&cakeLayers[5], squareCakeSheet);
+        } 
+        else if (cakeLayer6Type == STAR){
+            renderItem(&cakeLayers[5], starCakeSheet);
+        }
+    }
+    if (icingLayer6Type != NO_LAYER){
+        if (icingLayer6Type == CIRCLE){
+            renderItem(&icingLayers[5], circleIcingSheet);
+        }
+        else if (icingLayer6Type == SQUARE){
+            renderItem(&icingLayers[5], squareIcingSheet);
+        } 
+        else if (icingLayer6Type == STAR){
+            renderItem(&icingLayers[5], starIcingSheet);
+        }
+    }
+    if (toppingsLayer6Type != NO_LAYER){
+        renderItem(&toppingsLayer[5], toppingsSheet);
     }
 }
 
@@ -349,19 +515,23 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
         for (int i = 0; i < 3; i++){ dragItemOffset(&topping[i], 120, 20, 45, 0, 84, 50, mouse); }
     }
     for (int i = 0; i < 3; i++){
-        dropItemReturn(&topping[i], mouse);
+        if (cakeLayer > 1){
+                dropItemReturnBoolInt(&topping[i], mouse, cakeHitbox, &toppingOnCake, true, &toppingFlavorIndex, i);
+        } else {
+            dropItemReturn(&topping[i], mouse);
+        }
     }
 
     // pan items
     for (int i = 0; i < 3; i++){ 
         if (circleInOven == false && squareInOven == false && starInOven == false){ dragItem(&pan[i], mouse); }
-        if (pan[i].spriteIndex.y > 0 && i == 0 && cakeLayer < 4){
+        if (pan[i].spriteIndex.y > 0 && i == 0 && cakeLayer < 7){
             dropItemReturnBool(&pan[i], mouse, ovenHitbox, &circleInOven, true);
 
-        } else if (pan[i].spriteIndex.y > 0 && i == 1 && cakeLayer < 4){
+        } else if (pan[i].spriteIndex.y > 0 && i == 1 && cakeLayer < 7){
             dropItemReturnBool(&pan[i], mouse, ovenHitbox, &squareInOven, true);
 
-        } else if (pan[i].spriteIndex.y > 0 && i == 2 && cakeLayer < 4){
+        } else if (pan[i].spriteIndex.y > 0 && i == 2 && cakeLayer < 7){
             dropItemReturnBool(&pan[i], mouse, ovenHitbox, &starInOven, true);
 
         } else {
@@ -376,24 +546,64 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
         dragItemOffset(&cakeLayers[0], 121, 50, 0, -105, 243, 210, mouse);
         dropItemReturnBool(&cakeLayers[0], mouse, cartHitbox, &cakeReset, true);
     }
-    if (cakeLayers[0].isPressed == true){
+    if (cakeLayers[0].isPressed == true){ // moves the other cake layers and icing layers with the first cake layer
         icingLayers[0].position.x = cakeLayers[0].position.x;
-        icingLayers[0].position.y = cakeLayers[0].position.y; 
+        icingLayers[0].position.y = cakeLayers[0].position.y;
  
+        toppingsLayer[0].position.x = cakeLayers[0].position.x;
+        toppingsLayer[0].position.y = cakeLayers[0].position.y;
+
         cakeLayers[1].position.x = cakeLayers[0].position.x;
         cakeLayers[1].position.y = cakeLayers[0].position.y - 55;
 
         icingLayers[1].position.x = cakeLayers[1].position.x;
         icingLayers[1].position.y = cakeLayers[1].position.y;
 
+        toppingsLayer[1].position.x = cakeLayers[1].position.x;
+        toppingsLayer[1].position.y = cakeLayers[1].position.y;
+
         cakeLayers[2].position.x = cakeLayers[1].position.x;
         cakeLayers[2].position.y = cakeLayers[1].position.y - 55;
 
         icingLayers[2].position.x = cakeLayers[2].position.x;
         icingLayers[2].position.y = cakeLayers[2].position.y;
+
+        toppingsLayer[2].position.x = cakeLayers[2].position.x;
+        toppingsLayer[2].position.y = cakeLayers[2].position.y;
+
+        cakeLayers[3].position.x = cakeLayers[2].position.x;
+        cakeLayers[3].position.y = cakeLayers[2].position.y - 55;
+
+        icingLayers[3].position.x = cakeLayers[3].position.x;
+        icingLayers[3].position.y = cakeLayers[3].position.y;
+
+        toppingsLayer[3].position.x = cakeLayers[3].position.x;
+        toppingsLayer[3].position.y = cakeLayers[3].position.y;
+
+        cakeLayers[4].position.x = cakeLayers[3].position.x;
+        cakeLayers[4].position.y = cakeLayers[3].position.y - 55;
+
+        icingLayers[4].position.x = cakeLayers[4].position.x;
+        icingLayers[4].position.y = cakeLayers[4].position.y;
+
+        toppingsLayer[4].position.x = cakeLayers[4].position.x;
+        toppingsLayer[4].position.y = cakeLayers[4].position.y;
+
+        cakeLayers[5].position.x = cakeLayers[4].position.x;
+        cakeLayers[5].position.y = cakeLayers[4].position.y - 55;
+
+        icingLayers[5].position.x = cakeLayers[5].position.x;
+        icingLayers[5].position.y = cakeLayers[5].position.y;
+
+        toppingsLayer[5].position.x = cakeLayers[5].position.x;
+        toppingsLayer[5].position.y = cakeLayers[5].position.y;
+
     } else if (cakeLayers[0].isPressed == false){ // sends back to default positions after releasing left click
         icingLayers[0].position.x = cakeLayers[0].defaultPosition.x;
         icingLayers[0].position.y = cakeLayers[0].defaultPosition.y;
+
+        toppingsLayer[0].position.x = cakeLayers[0].defaultPosition.x;
+        toppingsLayer[0].position.y = cakeLayers[0].defaultPosition.y;
 
         cakeLayers[1].position.x = cakeLayers[1].defaultPosition.x;
         cakeLayers[1].position.y = cakeLayers[1].defaultPosition.y;
@@ -401,27 +611,75 @@ void kitchenLogic(GameState *currentState, Vector2 mouse){
         icingLayers[1].position.x = cakeLayers[1].defaultPosition.x;
         icingLayers[1].position.y = cakeLayers[1].defaultPosition.y;
 
+        toppingsLayer[1].position.x = cakeLayers[1].defaultPosition.x;
+        toppingsLayer[1].position.y = cakeLayers[1].defaultPosition.y;
+
         cakeLayers[2].position.x = cakeLayers[2].defaultPosition.x;
         cakeLayers[2].position.y = cakeLayers[2].defaultPosition.y;
 
         icingLayers[2].position.x = cakeLayers[2].defaultPosition.x;
         icingLayers[2].position.y = cakeLayers[2].defaultPosition.y;
+
+        toppingsLayer[2].position.x = cakeLayers[2].defaultPosition.x;
+        toppingsLayer[2].position.y = cakeLayers[2].defaultPosition.y;
+
+        cakeLayers[3].position.x = cakeLayers[3].defaultPosition.x;
+        cakeLayers[3].position.y = cakeLayers[3].defaultPosition.y;
+
+        icingLayers[3].position.x = cakeLayers[3].defaultPosition.x;
+        icingLayers[3].position.y = cakeLayers[3].defaultPosition.y;
+
+        toppingsLayer[3].position.x = cakeLayers[3].defaultPosition.x;
+        toppingsLayer[3].position.y = cakeLayers[3].defaultPosition.y;
+
+        cakeLayers[4].position.x = cakeLayers[4].defaultPosition.x;
+        cakeLayers[4].position.y = cakeLayers[4].defaultPosition.y;
+
+        icingLayers[4].position.x = cakeLayers[4].defaultPosition.x;
+        icingLayers[4].position.y = cakeLayers[4].defaultPosition.y;
+
+        toppingsLayer[4].position.x = cakeLayers[4].defaultPosition.x;
+        toppingsLayer[4].position.y = cakeLayers[4].defaultPosition.y;
+
+        cakeLayers[5].position.x = cakeLayers[5].defaultPosition.x;
+        cakeLayers[5].position.y = cakeLayers[5].defaultPosition.y;
+
+        icingLayers[5].position.x = cakeLayers[5].defaultPosition.x;
+        icingLayers[5].position.y = cakeLayers[5].defaultPosition.y;
+
+        toppingsLayer[5].position.x = cakeLayers[5].defaultPosition.x;
+        toppingsLayer[5].position.y = cakeLayers[5].defaultPosition.y;
     }
 
     // logic for dropping the cakes onto the cart and resetting the cake layers
     if (cakeReset == true){
-        for (int i = 0; i < 3; i++){ cakeLayers[i] = (Item){ {0}, {0}, {0}, { 0, 0 }, 0, 0, false }; }
+        for (int i = 0; i < 6; i++){ cakeLayers[i] = (Item){ {0}, {0}, {0}, { 0, 0 }, 0, 0, false }; }
         cakeLayer = 1;
         
         cakeLayer1Type = NO_LAYER;
         icingLayer1Type = NO_LAYER;
-        
+        toppingsLayer1Type = NO_LAYER;
+
         cakeLayer2Type = NO_LAYER;
         icingLayer2Type = NO_LAYER;
+        toppingsLayer2Type = NO_LAYER;
 
         cakeLayer3Type = NO_LAYER;
         icingLayer3Type = NO_LAYER;
-        
+        toppingsLayer3Type = NO_LAYER;
+
+        cakeLayer4Type = NO_LAYER;
+        icingLayer4Type = NO_LAYER;
+        toppingsLayer4Type = NO_LAYER;
+
+        cakeLayer5Type = NO_LAYER;
+        icingLayer5Type = NO_LAYER;
+        toppingsLayer5Type = NO_LAYER;
+
+        cakeLayer6Type = NO_LAYER;
+        icingLayer6Type = NO_LAYER;
+        toppingsLayer6Type = NO_LAYER;
+
         cakeReset = false;
     }
 
